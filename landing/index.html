@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5xTODO · El Rincón de 5 — Subsistema Seguridad</title>
+<meta name="description" content="Prototipo del subsistema Seguridad de El Rincón de 5 (5xTODO): registro, inicio de sesión y gestión de usuarios con roles. Proyecto SIS324.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--tinta:#1d2b53;--suave:#4a5578;--amarillo:#ffd400;--rojo:#d62839;--papel:#f3f5f9;--blanco:#fff;--linea:#d5dae6;--ok:#17794a}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Bricolage Grotesque',system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--tinta);background:var(--papel);line-height:1.5}
+a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 1.25rem}
+h1,h2,h3{margin:0 0 .6rem;line-height:1.05;font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(1.7rem,4vw,2.4rem)}
+h3{font-size:1.15rem;line-height:1.2}
+p{margin:0 0 1rem}
+:focus-visible{outline:3px solid var(--tinta);outline-offset:3px}
+
+header.top{background:var(--tinta);color:#fff;position:sticky;top:0;z-index:10}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-top:.7rem;padding-bottom:.7rem}
+.logo{display:flex;align-items:center;gap:.6rem;font-weight:800;text-decoration:none;font-size:1.1rem}
+.tag{background:var(--amarillo);color:var(--tinta);padding:.15rem .55rem;border-radius:4px;transform:rotate(-3deg);display:inline-block}
+nav a{color:#fff;text-decoration:none;margin-left:1.2rem;font-size:.92rem;opacity:.9}
+nav a:hover{opacity:1;text-decoration:underline}
+
+.hero{background:var(--tinta);color:#fff;padding:4rem 0 5rem;position:relative;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:3rem;align-items:center}
+.eyebrow{display:inline-block;font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.12);padding:.3rem .7rem;border-radius:99px;margin-bottom:1.2rem}
+.hero h1{margin-bottom:1.1rem;font-size:clamp(2.4rem,6vw,4rem)}
+.hero h1 em{font-style:normal;background:var(--amarillo);color:var(--tinta);padding:0 .25em;border-radius:5px}
+.hero p.lead{font-size:1.15rem;color:#d6dcf0;max-width:34em}
+.btns{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.6rem}
+.btn{display:inline-block;padding:.8rem 1.4rem;border-radius:6px;font-weight:800;text-decoration:none;border:2px solid var(--amarillo)}
+.btn.p{background:var(--amarillo);color:var(--tinta)}
+.btn.p:hover{background:#ffe34d}
+.btn.s{color:#fff;border-color:rgba(255,255,255,.4)}
+.btn.s:hover{border-color:#fff}
+
+.etiqueta{background:var(--amarillo);color:var(--tinta);border-radius:14px;padding:2rem 1.5rem;text-align:center;transform:rotate(3deg);box-shadow:0 14px 0 rgba(0,0,0,.18)}
+.etiqueta .bs{font-size:1.3rem;font-weight:800;letter-spacing:.05em}
+.etiqueta .n{font-size:7rem;font-weight:800;line-height:.9;color:var(--rojo)}
+.etiqueta small{display:block;font-weight:600;margin-top:.6rem}
+
+section{padding:4.5rem 0}
+.intro{max-width:44em}
+.grid{display:grid;gap:1.2rem;margin-top:2rem}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--blanco);border:1.5px solid var(--linea);border-radius:10px;padding:1.4rem}
+.card .ico{width:44px;height:44px;border-radius:10px;background:var(--amarillo);display:grid;place-items:center;font-size:1.4rem;margin-bottom:.9rem}
+.card p{color:var(--suave);margin:0;font-size:.95rem}
+.hu{font-size:.75rem;font-weight:800;color:var(--rojo);letter-spacing:.06em}
+
+.band{background:var(--blanco);border-block:1.5px solid var(--linea)}
+.roles .card{border-top:6px solid var(--amarillo)}
+.roles .card:nth-child(2){border-top-color:var(--rojo)}
+.roles .card:nth-child(3){border-top-color:var(--tinta)}
+.roles .card:nth-child(4){border-top-color:var(--ok)}
+
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+ul.check{list-style:none;padding:0;margin:0}
+ul.check li{padding:.7rem 0 .7rem 2rem;border-bottom:1px solid var(--linea);position:relative}
+ul.check li::before{content:"✓";position:absolute;left:0;top:.65rem;width:1.35rem;height:1.35rem;border-radius:50%;background:var(--ok);color:#fff;font-size:.8rem;display:grid;place-items:center;font-weight:800}
+
+.stack{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.4rem}
+.chip{background:var(--tinta);color:#fff;padding:.4rem .9rem;border-radius:99px;font-size:.88rem;font-weight:600}
+.chip.y{background:var(--amarillo);color:var(--tinta)}
+
+pre{background:var(--tinta);color:#e8ecfa;padding:1.2rem 1.3rem;border-radius:10px;overflow-x:auto;font-size:.88rem;line-height:1.6;margin:1rem 0}
+pre .c{color:#8f9bc4}
+table{width:100%;border-collapse:collapse;background:var(--blanco);border-radius:10px;overflow:hidden;border:1.5px solid var(--linea);font-size:.92rem}
+th,td{text-align:left;padding:.65rem .9rem;border-bottom:1px solid var(--linea)}
+th{background:var(--tinta);color:#fff}
+.tw{overflow-x:auto}
+
+.equipo{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem;margin-top:2rem;max-width:720px}
+.persona{display:flex;gap:1rem;align-items:center}
+.av{width:56px;height:56px;border-radius:50%;background:var(--amarillo);display:grid;place-items:center;font-weight:800;font-size:1.2rem;flex:none}
+.persona strong{display:block;line-height:1.2}
+.persona span{font-size:.85rem;color:var(--suave)}
+
+footer{background:var(--tinta);color:#c9d0e8;padding:2.2rem 0;font-size:.9rem}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem}
+footer strong{color:#fff}
+
+@media(max-width:860px){
+ .hero .wrap,.seg{grid-template-columns:1fr}
+ .g3,.g4{grid-template-columns:1fr 1fr}
+ .etiqueta{max-width:260px;margin:0 auto}
+ nav a:not(:last-child){display:none}
+}
+@media(max-width:560px){
+ .g3,.g4,.equipo{grid-template-columns:1fr}
+ section{padding:3.2rem 0}
+ .hero{padding:2.5rem 0 3.5rem}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+ <div class="wrap">
+  <a class="logo" href="#inicio"><span class="tag">5</span> El Rincón de 5</a>
+  <nav>
+   <a href="#funciones">Funciones</a>
+   <a href="#roles">Roles</a>
+   <a href="#seguridad">Seguridad</a>
+   <a href="#tecnologia">Tecnología</a>
+   <a href="#equipo">Equipo</a>
+  </nav>
+ </div>
+</header>
+
+<main id="inicio">
+ <div class="hero">
+  <div class="wrap">
+   <div>
+    <span class="eyebrow">SIS324 · Ingeniería de Software</span>
+    <h1>Todo a <em>5 Bolivianos</em>, con cuentas seguras.</h1>
+    <p class="lead">5xTODO es la tienda web de artículos a 5 Bs. Este prototipo implementa su subsistema de <strong>Seguridad</strong>: registro, inicio de sesión y gestión de usuarios con control de acceso por rol.</p>
+    <div class="btns">
+     <a class="btn p" href="#funciones">Ver funcionalidades</a>
+     <a class="btn s" href="#ejecutar">Cómo ejecutarlo</a>
+    </div>
+   </div>
+   <div class="etiqueta" aria-hidden="true">
+    <div class="bs">SOLO Bs.</div>
+    <div class="n">5</div>
+    <small>cada artículo · sin sorpresas</small>
+   </div>
+  </div>
+ </div>
+
+ <section id="proyecto">
+  <div class="wrap">
+   <div class="intro">
+    <h2>El proyecto</h2>
+    <p><strong>El Rincón de 5</strong> conecta a tres tipos de personas: <strong>Ana Quispe</strong>, clienta que quiere comprar y seguir sus pedidos; <strong>Don Ramiro Condori</strong>, revendedor que compra para vender; y el <strong>administrador</strong> de la tienda.</p>
+    <p>Para que cada uno acceda solo a lo suyo, el subsistema Seguridad resuelve el <strong>RF01</strong> (registro e inicio de sesión con correo o celular) y el <strong>RNF04</strong> (control de acceso por rol), con un CRUD completo de usuarios.</p>
+   </div>
+  </div>
+ </section>
+
+ <section id="funciones" class="band">
+  <div class="wrap">
+   <h2>Qué puedes hacer</h2>
+   <p>11 historias de usuario cubren todo el ciclo de vida de una cuenta.</p>
+   <div class="grid g3">
+    <article class="card"><div class="ico">📝</div><span class="hu">HU01</span><h3>Registrarte</h3><p>Crea tu cuenta solo con correo <em>o</em> celular y entra con la sesión ya iniciada.</p></article>
+    <article class="card"><div class="ico">🔑</div><span class="hu">HU02 · HU03</span><h3>Entrar y salir</h3><p>Un solo campo para correo o celular. Tu sesión dura 8 horas y puedes cerrarla cuando quieras.</p></article>
+    <article class="card"><div class="ico">👤</div><span class="hu">HU04 · HU05</span><h3>Tu perfil</h3><p>Actualiza tu nombre, contacto y contraseña sin poder cambiar tu propio rol.</p></article>
+    <article class="card"><div class="ico">🔍</div><span class="hu">HU06</span><h3>Buscar usuarios</h3><p>El administrador filtra por nombre, correo o celular mientras escribe.</p></article>
+    <article class="card"><div class="ico">➕</div><span class="hu">HU07 · HU08</span><h3>Crear y editar</h3><p>Da de alta repartidores y administradores, y corrige datos o roles de cualquier cuenta.</p></article>
+    <article class="card"><div class="ico">⏸️</div><span class="hu">HU09 · HU10</span><h3>Desactivar o eliminar</h3><p>Bloquea el acceso conservando el historial, o elimina la cuenta con confirmación previa.</p></article>
+   </div>
+  </div>
+ </section>
+
+ <section id="roles">
+  <div class="wrap">
+   <h2>Cada rol, lo suyo</h2>
+   <p>HU11 · El menú y la API solo exponen lo que corresponde a cada perfil.</p>
+   <div class="grid g4 roles">
+    <article class="card"><h3>Cliente</h3><p>Compra y gestiona únicamente su propia cuenta.</p></article>
+    <article class="card"><h3>Revendedor</h3><p>Compra para vender. Edita solo sus datos.</p></article>
+    <article class="card"><h3>Repartidor</h3><p>Rol operativo creado por el administrador.</p></article>
+    <article class="card"><h3>Administrador</h3><p>Gestiona todos los usuarios y asigna roles.</p></article>
+   </div>
+  </div>
+ </section>
+
+ <section id="seguridad" class="band">
+  <div class="wrap seg">
+   <div>
+    <h2>Seguridad desde el diseño</h2>
+    <p>Reglas pensadas para proteger los datos de quienes compran en la tienda.</p>
+   </div>
+   <ul class="check">
+    <li>Contraseñas con hash <strong>bcrypt</strong>, nunca en texto plano.</li>
+    <li>Mínimo 8 caracteres con letras y números.</li>
+    <li>Celular boliviano de 8 dígitos que empieza con 6 o 7.</li>
+    <li>El autoregistro solo permite cliente o revendedor.</li>
+    <li>Cuentas desactivadas o eliminadas pierden el acceso al instante.</li>
+    <li>El administrador no puede eliminarse ni quitarse el rol a sí mismo.</li>
+    <li>Correo y celular únicos; al menos uno por cuenta.</li>
+   </ul>
+  </div>
+ </section>
+
+ <section id="tecnologia">
+  <div class="wrap">
+   <h2>Tecnología</h2>
+   <p>Una API REST con base de datos embebida y una interfaz de una sola página.</p>
+   <div class="stack">
+    <span class="chip y">Node.js</span><span class="chip y">Express</span><span class="chip y">SQLite</span>
+    <span class="chip">JWT</span><span class="chip">bcrypt</span><span class="chip">React 18</span><span class="chip">Vite</span>
+   </div>
+   <div class="tw" style="margin-top:2rem">
+   <table>
+    <thead><tr><th>Operación</th><th>Endpoint</th></tr></thead>
+    <tbody>
+     <tr><td>Registro / inicio de sesión</td><td><code>POST /api/auth/registro</code> · <code>POST /api/auth/login</code></td></tr>
+     <tr><td>Sesión actual</td><td><code>GET /api/auth/me</code></td></tr>
+     <tr><td>Listar / buscar usuarios</td><td><code>GET /api/usuarios?q=</code></td></tr>
+     <tr><td>Crear · Editar · Eliminar</td><td><code>POST</code> · <code>PUT</code> · <code>DELETE /api/usuarios/:id</code></td></tr>
+    </tbody>
+   </table>
+   </div>
+  </div>
+ </section>
+
+ <section id="ejecutar" class="band">
+  <div class="wrap">
+   <h2>Cómo ejecutarlo</h2>
+   <p>Requiere Node.js instalado. Abre dos terminales:</p>
+<pre><span class="c"># Terminal 1 — API en http://localhost:3001</span>
+cd backend
+npm install
+npm start
+
+<span class="c"># Terminal 2 — Interfaz en http://localhost:5173</span>
+cd frontend
+npm install
+npm run dev</pre>
+   <p>Al primer arranque se crea un administrador inicial: <strong>admin@5xtodo.bo</strong> / <strong>Admin1234</strong>. Cámbiala antes de desplegar y define tu propio <code>JWT_SECRET</code>.</p>
+  </div>
+ </section>
+
+ <section id="equipo">
+  <div class="wrap">
+   <h2>Equipo</h2>
+   <p>Ingeniería en Sistemas · Ingeniería de Software (SIS324)</p>
+   <div class="equipo">
+    <div class="persona"><div class="av">MB</div><div><strong>Marcos Ronaldo Bello Saiquita</strong><span>Integrante</span></div></div>
+    <div class="persona"><div class="av">JV</div><div><strong>Juan Rodrigo Viscarra Rodriguez</strong><span>Integrante</span></div></div>
+   </div>
+  </div>
+ </section>
+</main>
+
+<footer>
+ <div class="wrap">
+  <div><strong>5xTODO · El Rincón de 5</strong><br>Prototipo del subsistema Seguridad</div>
+  <div>Proyecto de curso · SIS324 · Bolivia</div>
+ </div>
+</footer>
+</body>
+</html>

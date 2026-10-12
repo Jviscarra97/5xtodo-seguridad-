@@ -1,0 +1,5 @@
+services:
+  - type: web
+    name: 5xtodo-landing
+    runtime: static
+    staticPublishPath: .
